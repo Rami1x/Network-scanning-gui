@@ -15,6 +15,7 @@
 
 // Others
 #define TITLE "Network Scanner"
+#define IP_TITLE "Enter Local IPv4 Address"
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK ChildWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -89,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		"",
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
 		10,
-		70,
+		60,
 		TEXTBOX_X, TEXTBOX_Y,
 		hwndChild,
 		(HMENU)ID_TEXTBOX,
@@ -176,7 +177,7 @@ LRESULT CALLBACK ChildWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			SetTextColor(hdc, RGB(0,0,0));
 			SetBkMode(hdc, TRANSPARENT);
 			HFONT hFont = CreateFont(
-				32, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+				28, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
 				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 				DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
 			HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
@@ -184,6 +185,17 @@ LRESULT CALLBACK ChildWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			TextOut(hdc, 0, 0, TITLE, sizeof(TITLE));
 			
 			// Clean
+			SelectObject(hdc, hOldFont);
+			DeleteObject(hFont);
+			
+			HFONT hFont2 = CreateFont(
+				16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+				DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
+			HFONT hOldFont2 = (HFONT)SelectObject(hdc, hFont);
+			
+			TextOut(hdc, 10, 40, IP_TITLE, sizeof(IP_TITLE)); 
+			
 			SelectObject(hdc, hOldFont);
 			DeleteObject(hFont);
 			EndPaint(hwnd, &ps);
