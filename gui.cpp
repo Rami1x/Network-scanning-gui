@@ -8,7 +8,7 @@
 // Dimensions
 #define WIND_X 500
 #define WIND_Y 400
-#define TEXTBOX_X 220
+#define TEXTBOX_X 230
 #define TEXTBOX_Y 25
 #define BUTTON_X 100
 #define BUTTON_Y 30
@@ -89,7 +89,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		"",
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
 		10,
-		50,
+		70,
 		TEXTBOX_X, TEXTBOX_Y,
 		hwndChild,
 		(HMENU)ID_TEXTBOX,
