@@ -144,6 +144,28 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
 			FillRect(hdc, &ps.rcPaint, hBrush);
 			DeleteObject(hBrush);
+			
+			// text stuff
+			SetTextColor(hdc, RGB(0,0,0));
+			SetBkMode(hdc, TRANSPARENT);
+			HFONT hFont = CreateFont(
+				28, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+				DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
+			HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+			
+			TextOut(hdc, (WIND_X/2)+5, 0, "Output Details", 14);
+			DeleteObject(hFont);
+			
+			HFONT hFont2 = CreateFont(
+				16, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+				DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
+			HFONT hOldFont2 = (HFONT)SelectObject(hdc, hFont2);
+			
+			TextOut(hdc, WIND_X-200,WIND_Y-55, "Press ESC to exit", 17);
+			DeleteObject(hFont2);
+			
 			EndPaint(hwnd, &ps);
 			break;
 		}
