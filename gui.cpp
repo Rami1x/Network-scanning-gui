@@ -4,6 +4,7 @@
 // IDs
 #define ID_SUBMIT_BUTTON 1001
 #define ID_TEXTBOX 1002
+#define ID_TEXTBOXB 1003
 
 // Dimensions
 #define WIND_X 500
@@ -11,16 +12,17 @@
 #define TEXTBOX_X 230
 #define TEXTBOX_Y 25
 #define BUTTON_X 100
-#define BUTTON_Y 30
+#define BUTTON_Y 25
 
 // Others
 #define TITLE "Network Scanner"
-#define IP_TITLE "Enter Local IPv4 Address"
+#define IP_TITLE "Enter Local IPv4 Address & Port"
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK ChildWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HWND hSubmitButton;
 HWND hTextInput;
+HWND hTextInputB;
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
@@ -97,6 +99,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		hInstance,
 		NULL
 		);
+	
+	hTextInputB = CreateWindow(
+		"EDIT",
+		"",
+		WS_CHILD | WS_VISIBLE | WS_BORDER,
+		10,
+		90,
+		TEXTBOX_X/3, TEXTBOX_Y,
+		hwndChild,
+		(HMENU)ID_TEXTBOXB,
+		hInstance,
+		NULL
+		);	
 	
 	
 	hSubmitButton = CreateWindow(
@@ -220,6 +235,8 @@ LRESULT CALLBACK ChildWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			
 			SelectObject(hdc, hOldFont);
 			DeleteObject(hFont);
+			
+			
 			EndPaint(hwnd, &ps);
 			
 			return 0;
