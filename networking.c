@@ -1,83 +1,79 @@
+#include "netinput.h"
 #include <stdio.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #include <string.h>
 
-#pragma comment(lib, "ws2_32.lib")
-
-#define IP_ADDRESS "10.146.169.126"
-#define PORT 80
 #define TIMEOUT 2000
 #define MAX_HOSTNAME_LENGTH 256
 
-int main() {
-	WSADATA wsa;					
-	SOCKET socker;					
-	struct sockaddr_in target;
-	struct hostent* host;	
-	int res;
-	char hostname[MAX_HOSTNAME_LENGTH] = "unknown";
-	
-	
-	// Initialize Winsock
-	
+int initialize_winsock() {
+	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
-		printf("WSAStartup failed.\n");
-		return 1;
+		return 1;	// Error
 	}
+	return 0;		// Success WOOO!
+}
+
+void cleanup_winsock() {
+	WSACleanup();
+}
+
+int scan_port(const char* ip_address, int port, char* hostname) {
+	SOCKET socker;
+	struct sockaddr_in target;
+	int res;
+	struct hostent* host;
 	
-	printf("Checking port %d on %s...\n", PORT, IP_ADDRESS);
-	
-	// Get hostname :) 
-	unsigned long ip = inet_addr(IP_ADDRESS);
+	// Get da hostname 
+	unsigned long ip = inet_addr(ip_address); 	//must be unsigned long to use it
 	if (ip != INADDR_NONE) {
 		host = gethostbyaddr((const char*)&ip, sizeof(ip), AF_INET);
 		if (host != NULL) {
 			strncpy(hostname, host->h_name, MAX_HOSTNAME_LENGTH - 1);
 			hostname[MAX_HOSTNAME_LENGTH - 1] = '\0';
+		} 
+		else {
+			strcpy(hostname, "unknown");
 		}
 	}
-	printf("Hostname: %s\n", hostname);
+	else {
+		strcpy(hostname, "unknown");
+	}
 	
-	// Creating Socket
+	// Creating the socket and error correcting
 	socker = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (socker == INVALID_SOCKET) {
-		printf("Socket creation failed: %d\n", WSAGetLastError());
-		WSACleanup();
-		return 1;
+		return -1;
 	}
 	
-	// Set up the target address
+	// This part is for the target
 	target.sin_family = AF_INET;
-	target.sin_port = htons(PORT);
+	target.sin_port = htons(port);
+	target.sin_addr.s_addr = inet_addr(ip_address);
+	
 	if (target.sin_addr.s_addr == INADDR_NONE) {
-		printf("Invalid address not supported: %s\n", IP_ADDRESS);
 		closesocket(socker);
-		WSACleanup();
-		return 1;
+		return 2;
 	}
 	
-	// Set timeout for connection attempt
-	DWORD timeout = TIMEOUT;
+	// Timeout stuff
+	DWORD timeout = TIMEOUT;		// DWORD IS A 32bit unsigned integer
 	setsockopt(socker, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 	setsockopt(socker, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeout, sizeof(timeout));
 	
-	// attempt to connect
+	// attempting to connect
 	res = connect(socker, (struct sockaddr*)&target, sizeof(target));
+	closesocket(socker);
+	
 	if (res == SOCKET_ERROR) {
 		int error = WSAGetLastError();
 		if (error == WSAETIMEDOUT) {
-			printf("Port %d: Connection timed out (Filtered?)", PORT);
-		} else if (error == WSAECONNREFUSED) {
-			printf("Port %d: Closed\n", PORT);
-		} else {
-			printf("Port %d: Error connection (%d)\n", PORT, error);
+			return -3;		//Timeout :(
 		}
-	} else {
-		printf("Port %d: Open\n", PORT);
+		else if (error == WSAECONNREFUSED){
+			return -4;		// Connection refused (blocked)
+		}
+		return -5;			// Unknown error
 	}
 	
-	closesocket(socker);
-	WSACleanup();
-	return 0;
+	return 0;  				// Success (port open)
 }
